@@ -14,6 +14,19 @@ import {
   DimeCategoriesMockup,
   DimeImportMockup,
 } from "@/components/case-study/mockups/DimeMockups";
+import {
+  NoSessionMockup,
+  InconsistentCurrencyMockup,
+  GenericTrackerMockup,
+  PlacardMockup,
+  InconsistentAppMockup,
+  LedgerMockup,
+} from "@/components/case-study/mockups/BeforeMockups";
+import {
+  MyraAfterMockup,
+  ARCameraMockup,
+  ARestroAfterMockup,
+} from "@/components/case-study/mockups/AfterMockups";
 
 export const mockupRegistry: Record<string, ReactNode> = {
   "cash-sessions-list": <SessionListMockup />,
@@ -25,4 +38,13 @@ export const mockupRegistry: Record<string, ReactNode> = {
   "dime-dashboard": <DimeDashboardMockup />,
   "dime-categories": <DimeCategoriesMockup />,
   "dime-import": <DimeImportMockup />,
+  "before-no-session": <NoSessionMockup />,
+  "before-inconsistent-currency": <InconsistentCurrencyMockup />,
+  "before-generic-tracker": <GenericTrackerMockup />,
+  "before-placard": <PlacardMockup />,
+  "before-inconsistent-app": <InconsistentAppMockup />,
+  "before-ledger": <LedgerMockup />,
+  "after-myra": <MyraAfterMockup />,
+  "after-ar-camera": <ARCameraMockup />,
+  "after-arestro": <ARestroAfterMockup />,
 };

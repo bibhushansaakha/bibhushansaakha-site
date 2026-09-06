@@ -16,6 +16,12 @@ import { CommitGraph } from "@/components/case-study/CommitGraph";
 import { BeforeAfter } from "@/components/case-study/BeforeAfter";
 import { QuoteBlock } from "@/components/case-study/QuoteBlock";
 import { CreditsBlock } from "@/components/case-study/CreditsBlock";
+import { ConstraintsList } from "@/components/case-study/ConstraintsList";
+import { AlternativesConsidered } from "@/components/case-study/AlternativesConsidered";
+import { EdgeCases } from "@/components/case-study/EdgeCases";
+import { PhaseTimeline } from "@/components/case-study/PhaseTimeline";
+import { FAQAccordion } from "@/components/case-study/FAQAccordion";
+import { CompareSlider } from "@/components/case-study/CompareSlider";
 import { mockupRegistry } from "@/components/case-study/MockupRegistry";
 import { projects, getProjectBySlug } from "@/lib/content/projects";
 
@@ -145,12 +151,44 @@ export default async function CaseStudyPage({
             </SectionBlock>
           </Reveal>
 
+          {project.constraints && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.constraints.title}>
+                <p className="mb-8">{project.constraints.intro}</p>
+                <ConstraintsList constraints={project.constraints.items} />
+              </SectionBlock>
+            </Reveal>
+          )}
+
           {project.beforeAfter && (
             <Reveal>
               <p className="mb-4 font-mono text-xs uppercase tracking-wider text-muted">
                 {project.beforeAfter.title}
               </p>
               <BeforeAfter before={project.beforeAfter.before} after={project.beforeAfter.after} />
+            </Reveal>
+          )}
+
+          {project.compareSlider && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.compareSlider.title}>
+                <p className="mb-8">{project.compareSlider.intro}</p>
+                <CompareSlider
+                  before={mockupRegistry[project.compareSlider.beforeMockupId] ?? null}
+                  after={mockupRegistry[project.compareSlider.afterMockupId] ?? null}
+                  beforeLabel={project.compareSlider.beforeLabel}
+                  afterLabel={project.compareSlider.afterLabel}
+                />
+              </SectionBlock>
+            </Reveal>
+          )}
+
+          {project.alternatives && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.alternatives.title}>
+                <p className="mb-8">{project.alternatives.intro}</p>
+                <AlternativesConsidered options={project.alternatives.options} />
+              </SectionBlock>
             </Reveal>
           )}
 
@@ -209,6 +247,24 @@ export default async function CaseStudyPage({
             </Reveal>
           )}
 
+          {project.edgeCases && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.edgeCases.title}>
+                <p className="mb-8">{project.edgeCases.intro}</p>
+                <EdgeCases cases={project.edgeCases.cases} />
+              </SectionBlock>
+            </Reveal>
+          )}
+
+          {project.phaseTimeline && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.phaseTimeline.title}>
+                <p className="mb-8">{project.phaseTimeline.intro}</p>
+                <PhaseTimeline phases={project.phaseTimeline.phases} />
+              </SectionBlock>
+            </Reveal>
+          )}
+
           {project.commitGraph && (
             <Reveal>
               <SectionBlock index={idx()} title={project.commitGraph.title}>
@@ -250,6 +306,14 @@ export default async function CaseStudyPage({
             <Reveal>
               <SectionBlock index={idx()} title={project.credits.title}>
                 <CreditsBlock credits={project.credits.members} />
+              </SectionBlock>
+            </Reveal>
+          )}
+
+          {project.faq && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.faq.title}>
+                <FAQAccordion items={project.faq.items} />
               </SectionBlock>
             </Reveal>
           )}
