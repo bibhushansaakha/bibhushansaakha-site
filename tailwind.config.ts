@@ -5,55 +5,44 @@ const config: Config = {
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    borderRadius: {
+      none: "0",
+      DEFAULT: "0",
+      full: "9999px", // reserved only for true circles: dots, avatars, clock
+    },
     extend: {
       colors: {
-        ink: {
-          950: "#0B0F14",
-          900: "#111722",
-          800: "#1A2230",
-          700: "#26303F",
-          600: "#3A4759",
-          500: "#5B6A7E",
-          400: "#8996A6",
-          300: "#B7C0CB",
-          200: "#DDE2E8",
-          100: "#EFF2F5",
-          50: "#F8FAFB",
-        },
-        accent: {
-          DEFAULT: "#2C6E8E",
-          light: "#4C93B6",
-          dark: "#1F4F68",
-        },
+        ink: "#14110F",
+        paper: "#F7F5F2",
+        "paper-dim": "#EEEAE3",
+        muted: "#6B645C",
+        line: "#DAD4CA",
+        accent: "#2D6CDF",
+        rust: "#B43B1F",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        display: ["var(--font-instrument)", "Georgia", "serif"],
         mono: ["var(--font-jetbrains)", "ui-monospace", "monospace"],
+      },
+      fontSize: {
+        "display-1": ["clamp(3rem, 9vw, 8.5rem)", { lineHeight: "0.92", letterSpacing: "-0.03em" }],
+        "display-2": ["clamp(2.25rem, 5vw, 4.5rem)", { lineHeight: "0.98", letterSpacing: "-0.02em" }],
+        "display-3": ["clamp(1.75rem, 3vw, 2.75rem)", { lineHeight: "1.05", letterSpacing: "-0.01em" }],
       },
       maxWidth: {
         prose: "42rem",
-        content: "72rem",
+        content: "84rem",
       },
-      typography: {
-        DEFAULT: {
-          css: {
-            maxWidth: "none",
-          },
-        },
+      transitionTimingFunction: {
+        swiss: "cubic-bezier(0.16, 1, 0.3, 1)",
       },
       animation: {
-        "fade-up": "fadeUp 0.6s ease-out forwards",
-        "fade-in": "fadeIn 0.6s ease-out forwards",
+        marquee: "marquee 28s linear infinite",
       },
       keyframes: {
-        fadeUp: {
-          "0%": { opacity: "0", transform: "translateY(16px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        fadeIn: {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
         },
       },
     },

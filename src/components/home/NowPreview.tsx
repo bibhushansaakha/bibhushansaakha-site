@@ -1,41 +1,44 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
+import { SectionLabel } from "@/components/ui/SectionLabel";
+import { Reveal, RevealGroup } from "@/components/motion/Reveal";
 import { nowItems } from "@/lib/content/site";
 
 export function NowPreview() {
   return (
-    <section className="py-20 sm:py-28">
+    <section className="relative z-10 py-24 sm:py-32">
       <Container>
-        <div className="rounded-3xl bg-ink-900 px-8 py-12 text-white sm:px-12 sm:py-16">
-          <div className="flex flex-wrap items-start justify-between gap-6">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-widest text-white/50">
-                Right now
-              </p>
-              <h2 className="mt-3 font-display text-3xl sm:text-4xl">
-                What I&apos;m doing currently
-              </h2>
-            </div>
+        <SectionLabel index="02" title="Right now" />
+
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-6 border-b hairline pb-8">
+            <h2 className="max-w-xl text-display-2 font-medium tracking-tight text-ink">
+              What I&apos;m doing currently
+            </h2>
             <Link
               href="/now"
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
+              data-cursor="hover"
+              className="prose-underline flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-ink"
             >
-              Read more <ArrowUpRight size={15} />
+              Full /now page <ArrowUpRight size={14} />
             </Link>
           </div>
+        </Reveal>
 
-          <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {nowItems.slice(0, 4).map((item) => (
-              <li
-                key={item}
-                className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-white/80"
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <RevealGroup className="mt-2 grid grid-cols-1 sm:grid-cols-2">
+          {nowItems.map((item, i) => (
+            <div
+              key={item}
+              className="border-b hairline py-8 pr-6 sm:border-r sm:odd:border-r sm:[&:nth-child(2)]:border-r-0 sm:[&:nth-child(4)]:border-r-0"
+            >
+              <span className="font-mono text-xs tabular text-muted">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <p className="mt-3 text-lg leading-relaxed text-ink/90">{item}</p>
+            </div>
+          ))}
+        </RevealGroup>
       </Container>
     </section>
   );

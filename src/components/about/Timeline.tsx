@@ -1,28 +1,24 @@
 import { timeline } from "@/lib/content/timeline";
+import { RevealGroup } from "@/components/motion/Reveal";
 
 export function Timeline() {
   return (
-    <ol className="relative border-l border-ink-200 pl-8">
+    <RevealGroup className="divide-y hairline border-t border-b hairline">
       {timeline.map((entry) => (
-        <li key={`${entry.period}-${entry.title}`} className="mb-10 last:mb-0">
-          <span className="absolute -left-[7px] mt-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-accent" />
-          <p className="text-xs font-medium uppercase tracking-widest text-accent">
-            {entry.period}
-          </p>
-          <h3 className="mt-1 font-display text-xl text-ink-900">
-            {entry.title}
-            {entry.org && (
-              <span className="font-sans text-base font-normal text-ink-400">
-                {" "}
-                &middot; {entry.org}
-              </span>
-            )}
-          </h3>
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-ink-500">
-            {entry.description}
-          </p>
-        </li>
+        <div
+          key={`${entry.period}-${entry.title}`}
+          className="grid grid-cols-1 gap-2 py-8 sm:grid-cols-[8rem_1fr]"
+        >
+          <p className="font-mono text-xs uppercase tracking-wider text-accent">{entry.period}</p>
+          <div>
+            <h3 className="text-xl font-medium text-ink">
+              {entry.title}
+              {entry.org && <span className="font-normal text-muted"> · {entry.org}</span>}
+            </h3>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{entry.description}</p>
+          </div>
+        </div>
       ))}
-    </ol>
+    </RevealGroup>
   );
 }

@@ -3,8 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --background: #F8FAFB;
-  --foreground: #111722;
+  --background: #F7F5F2;
+  --foreground: #14110F;
+}
+
+html {
+  background: var(--background);
 }
 
 body {
@@ -13,8 +17,8 @@ body {
 }
 
 ::selection {
-  background: #2C6E8E;
-  color: white;
+  background: #2D6CDF;
+  color: #F7F5F2;
 }
 
 .prose-underline {
@@ -22,6 +26,47 @@ body {
   background-size: 100% 1px;
   background-repeat: no-repeat;
   background-position: 0 100%;
+}
+
+/* Swiss column-grid guide lines: 12 columns, visible as faint hairlines */
+.grid-lines {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  pointer-events: none;
+  z-index: 0;
+}
+.grid-lines > span {
+  border-left: 1px solid rgba(20, 17, 15, 0.06);
+  height: 100%;
+}
+.grid-lines > span:last-child {
+  border-right: 1px solid rgba(20, 17, 15, 0.06);
+}
+
+.hairline {
+  border-color: #DAD4CA;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom cursor dot used on hoverable elements, desktop only */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #2D6CDF;
+  pointer-events: none;
+  z-index: 200;
+  mix-blend-mode: difference;
+  transform: translate(-50%, -50%);
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {

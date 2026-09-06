@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { Tag } from "@/components/ui/Tag";
-import { ProjectMockup } from "@/components/work/MockupRegistry";
+import { Reveal, RevealGroup } from "@/components/motion/Reveal";
+import { CountUp } from "@/components/motion/CountUp";
+import { GridLines } from "@/components/ui/GridLines";
+import { TypographicCover } from "@/components/work/TypographicCover";
 import { projects, getProjectBySlug } from "@/lib/content/projects";
 
 export function generateStaticParams() {
@@ -22,10 +26,7 @@ export async function generateMetadata({
   return {
     title: project.title,
     description: project.summary,
-    openGraph: {
-      title: project.title,
-      description: project.summary,
-    },
+    openGraph: { title: project.title, description: project.summary },
   };
 }
 
@@ -42,140 +43,177 @@ export default async function CaseStudyPage({
   const next = projects[(currentIndex + 1) % projects.length];
 
   return (
-    <article className="py-16 sm:py-24">
-      <Container size="narrow">
-        <Link
-          href="/work"
-          className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-900"
-        >
-          <ArrowLeft size={15} /> All work
-        </Link>
+    <>
+      <GridLines />
+      <article className="relative z-10 py-16 sm:py-24">
+        <Container>
+          <Reveal>
+            <Link
+              href="/work"
+              data-cursor="hover"
+              className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-muted hover:text-ink"
+            >
+              <ArrowLeft size={14} /> All work
+            </Link>
 
-        <div className="mt-6 flex flex-wrap items-center gap-2">
-          <Tag>{project.category}</Tag>
-          {project.status === "paused" && (
-            <span className="rounded-full bg-ink-100 px-3 py-1 text-xs font-medium text-ink-500">
-              Paused
-            </span>
-          )}
-        </div>
+            <div className="mt-8 flex flex-wrap items-center gap-2">
+              <Tag>{project.category}</Tag>
+              {project.status === "paused" && <Tag className="text-rust">Paused</Tag>}
+              {project.status === "unshipped" && <Tag>Unshipped</Tag>}
+            </div>
 
-        <h1 className="mt-4 font-display text-4xl text-ink-900 sm:text-5xl">
-          {project.title}
-        </h1>
-        <p className="mt-3 text-xl text-ink-500">{project.subtitle}</p>
+            <h1 className="mt-5 text-display-1 font-medium tracking-tight text-ink">
+              {project.title}
+            </h1>
+            <p className="mt-4 max-w-2xl text-xl leading-snug text-muted sm:text-2xl">
+              {project.subtitle}
+            </p>
 
-        <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-2 border-y border-ink-100 py-5 text-sm">
-          <div>
-            <dt className="text-ink-400">Role</dt>
-            <dd className="mt-0.5 font-medium text-ink-800">{project.role}</dd>
-          </div>
-          <div>
-            <dt className="text-ink-400">Timeframe</dt>
-            <dd className="mt-0.5 font-medium text-ink-800">{project.timeframe}</dd>
-          </div>
-        </dl>
-      </Container>
-
-      <Container size="narrow" className="mt-10">
-        <ProjectMockup name={project.mockup} />
-      </Container>
-
-      <Container size="narrow" className="mt-14 space-y-14">
-        <section>
-          <h2 className="font-display text-2xl text-ink-900">Context</h2>
-          <p className="mt-4 text-lg leading-relaxed text-ink-600">
-            {project.context}
-          </p>
-        </section>
-
-        <section>
-          <h2 className="font-display text-2xl text-ink-900">The problem</h2>
-          <p className="mt-4 text-lg leading-relaxed text-ink-600">
-            {project.problem}
-          </p>
-        </section>
-
-        <section>
-          <h2 className="font-display text-2xl text-ink-900">Approach</h2>
-          <ol className="mt-6 space-y-6">
-            {project.approach.map((step, i) => (
-              <li key={step.title} className="flex gap-4">
-                <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-ink-900 font-mono text-xs text-white">
-                  {i + 1}
-                </span>
-                <div>
-                  <h3 className="font-medium text-ink-900">{step.title}</h3>
-                  <p className="mt-1.5 leading-relaxed text-ink-500">
-                    {step.detail}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section>
-          <h2 className="font-display text-2xl text-ink-900">
-            Key decisions
-          </h2>
-          <div className="mt-6 space-y-4">
-            {project.decisions.map((decision) => (
-              <div
-                key={decision.title}
-                className="rounded-xl border border-ink-100 bg-white p-5"
-              >
-                <h3 className="font-medium text-ink-900">{decision.title}</h3>
-                <p className="mt-1.5 leading-relaxed text-ink-500">
-                  {decision.detail}
-                </p>
+            <dl className="mt-10 grid grid-cols-2 gap-6 border-y hairline py-6 sm:grid-cols-4">
+              <div>
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-muted">Role</dt>
+                <dd className="mt-1 text-sm font-medium text-ink">{project.role}</dd>
               </div>
-            ))}
-          </div>
-        </section>
+              <div>
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-muted">Timeframe</dt>
+                <dd className="mt-1 text-sm font-medium text-ink">{project.timeframe}</dd>
+              </div>
+              <div className="col-span-2 sm:col-span-2">
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-muted">Stack</dt>
+                <dd className="mt-1 text-sm font-medium text-ink">{project.stack.join(" \u00b7 ")}</dd>
+              </div>
+            </dl>
+          </Reveal>
+        </Container>
 
-        <section>
-          <h2 className="font-display text-2xl text-ink-900">Outcome</h2>
-          <p className="mt-4 text-lg leading-relaxed text-ink-600">
-            {project.outcome}
-          </p>
-        </section>
+        <Container className="mt-12">
+          <Reveal>
+            <div className="relative aspect-[16/9] w-full overflow-hidden border hairline bg-paper-dim">
+              {project.coverType === "typographic" ? (
+                <TypographicCover
+                  index=""
+                  title={project.cover}
+                  meta={project.coverMeta ?? ""}
+                  color={project.coverColor}
+                />
+              ) : (
+                <Image
+                  src={project.cover}
+                  alt={`${project.title} overview`}
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 84rem, 100vw"
+                />
+              )}
+            </div>
+          </Reveal>
+        </Container>
 
-        <section>
-          <h2 className="font-display text-2xl text-ink-900">Stack</h2>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {project.stack.map((tech) => (
-              <Tag key={tech}>{tech}</Tag>
-            ))}
-          </div>
-        </section>
+        <Container size="narrow" className="mt-16 space-y-20 sm:mt-24">
+          <Reveal>
+            <SectionBlock index="01" title="Context">
+              <p>{project.context}</p>
+            </SectionBlock>
+          </Reveal>
 
-        {project.confidentialityNote && (
-          <p className="border-t border-ink-100 pt-6 text-sm italic text-ink-400">
-            {project.confidentialityNote}
-          </p>
-        )}
-      </Container>
+          <Reveal>
+            <SectionBlock index="02" title="The problem">
+              <p>{project.problem}</p>
+            </SectionBlock>
+          </Reveal>
 
-      <Container size="narrow" className="mt-20">
-        <Link
-          href={`/work/${next.slug}`}
-          className="group flex items-center justify-between rounded-2xl border border-ink-100 bg-white p-6 transition-colors hover:border-ink-300"
-        >
           <div>
-            <p className="text-xs font-medium uppercase tracking-widest text-ink-400">
-              Next case study
-            </p>
-            <p className="mt-1 font-display text-xl text-ink-900">
-              {next.title}
-            </p>
+            <SectionBlock index="03" title="Approach" />
+            <RevealGroup className="mt-8 space-y-10">
+              {project.approach.map((step, i) => (
+                <div key={step.title} className="grid grid-cols-1 gap-4 border-t hairline pt-8 sm:grid-cols-[3rem_1fr]">
+                  <span className="font-mono text-sm tabular text-muted">{String(i + 1).padStart(2, "0")}</span>
+                  <div>
+                    <h3 className="text-xl font-medium text-ink">{step.title}</h3>
+                    <p className="mt-3 leading-relaxed text-ink/80">{step.body}</p>
+                    {step.caption && (
+                      <p className="mt-3 border-l-2 border-accent pl-3 font-mono text-xs uppercase tracking-wide text-muted">
+                        {step.caption}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </RevealGroup>
           </div>
-          <ArrowRight
-            size={20}
-            className="text-ink-400 transition-transform group-hover:translate-x-1"
-          />
-        </Link>
-      </Container>
-    </article>
+
+          <Reveal>
+            <SectionBlock index="04" title="Solution">
+              <p>{project.solution}</p>
+            </SectionBlock>
+          </Reveal>
+
+          <Reveal>
+            <SectionBlock index="05" title="Outcomes">
+              <dl className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+                {project.outcomes.map((outcome) => (
+                  <div key={outcome.label}>
+                    <dt className="sr-only">{outcome.label}</dt>
+                    <dd className="font-mono text-4xl tabular text-ink">
+                      <CountUp value={outcome.value} />
+                    </dd>
+                    <p className="mt-2 text-sm leading-snug text-muted">{outcome.label}</p>
+                  </div>
+                ))}
+              </dl>
+            </SectionBlock>
+          </Reveal>
+
+          <Reveal>
+            <SectionBlock index="06" title="What I'd do differently">
+              <p>{project.reflection}</p>
+            </SectionBlock>
+          </Reveal>
+
+          {project.confidentialityNote && (
+            <p className="border-t hairline pt-6 text-sm italic text-muted">
+              {project.confidentialityNote}
+            </p>
+          )}
+        </Container>
+
+        <Container className="mt-24">
+          <Reveal>
+            <Link
+              href={`/work/${next.slug}`}
+              data-cursor="hover"
+              className="group flex items-center justify-between border hairline p-8 transition-colors hover:border-ink"
+            >
+              <div>
+                <p className="font-mono text-xs uppercase tracking-wider text-muted">Next case study</p>
+                <p className="mt-2 text-2xl font-medium text-ink">{next.title}</p>
+              </div>
+              <ArrowRight size={22} className="text-muted transition-transform group-hover:translate-x-1 group-hover:text-ink" />
+            </Link>
+          </Reveal>
+        </Container>
+      </article>
+    </>
+  );
+}
+
+function SectionBlock({
+  index,
+  title,
+  children,
+}: {
+  index: string;
+  title: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div className="mb-6 flex items-baseline gap-3">
+        <span className="font-mono text-xs tabular text-accent">{index}</span>
+        <h2 className="text-2xl font-medium tracking-tight text-ink">{title}</h2>
+      </div>
+      {children && <div className="text-lg leading-relaxed text-ink/80">{children}</div>}
+    </section>
   );
 }

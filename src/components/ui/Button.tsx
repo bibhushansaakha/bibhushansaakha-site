@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ReactNode } from "react";
 import clsx from "clsx";
 import { ArrowUpRight } from "lucide-react";
+import { Magnetic } from "@/components/motion/Magnetic";
 
 interface ButtonProps {
   href: string;
@@ -19,31 +20,35 @@ export function Button({
   className,
 }: ButtonProps) {
   const classes = clsx(
-    "inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium transition-all",
+    "inline-flex items-center gap-2 border px-6 py-3 text-sm font-medium uppercase tracking-wider transition-colors duration-300",
     variant === "primary"
-      ? "bg-ink-900 text-white hover:bg-ink-700"
-      : "border border-ink-200 text-ink-900 hover:border-ink-400 hover:bg-ink-100",
+      ? "border-ink bg-ink text-paper hover:bg-transparent hover:text-ink"
+      : "border-ink bg-transparent text-ink hover:bg-ink hover:text-paper",
     className
   );
 
   const content = (
     <>
       {children}
-      {external && <ArrowUpRight size={16} />}
+      {external && <ArrowUpRight size={15} />}
     </>
   );
 
   if (external) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
-        {content}
-      </a>
+      <Magnetic className="inline-block">
+        <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
+          {content}
+        </a>
+      </Magnetic>
     );
   }
 
   return (
-    <Link href={href} className={classes}>
-      {content}
-    </Link>
+    <Magnetic className="inline-block">
+      <Link href={href} className={classes}>
+        {content}
+      </Link>
+    </Magnetic>
   );
 }
