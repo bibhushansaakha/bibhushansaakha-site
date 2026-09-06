@@ -9,6 +9,27 @@ export interface Stat {
   label: string;
 }
 
+export interface ResearchFinding {
+  value: string;
+  label: string;
+  source?: string;
+}
+
+export interface PaletteColor {
+  name: string;
+  hex: string;
+}
+
+export interface DiagramNode {
+  label: string;
+  detail?: string;
+}
+
+export interface GalleryItem {
+  caption: string;
+  mockupId: string;
+}
+
 export interface Project {
   slug: string;
   title: string;
@@ -33,6 +54,50 @@ export interface Project {
   stack: string[];
   confidentialityNote?: string;
   nextSlug: string;
+
+  // Editorial depth sections \u2014 all optional, all grounded in verified
+  // real facts, real design tokens, or real (if partial) commit history.
+  research?: {
+    title: string;
+    intro: string;
+    findings: ResearchFinding[];
+  };
+  designSystem?: {
+    title: string;
+    intro: string;
+    colors: PaletteColor[];
+    notes: string[];
+  };
+  architecture?: {
+    title: string;
+    intro: string;
+    source: DiagramNode;
+    targets: DiagramNode[];
+  };
+  commitGraph?: {
+    title: string;
+    intro: string;
+    data: number[];
+    totalLabel: string;
+  };
+  beforeAfter?: {
+    title: string;
+    before: { title: string; points: string[] };
+    after: { title: string; points: string[] };
+  };
+  mockupGallery?: {
+    title: string;
+    intro: string;
+    items: GalleryItem[];
+  };
+  quote?: {
+    quote: string;
+    author: string;
+  };
+  credits?: {
+    title: string;
+    members: { name: string; role: string }[];
+  };
 }
 
 export const projects: Project[] = [
@@ -55,6 +120,27 @@ export const projects: Project[] = [
       "Tigg POS is the point-of-sale product inside the Tigg suite, used daily by shops and restaurants across Nepal. Cash moved in and out of drawers all day \u2014 sales, refunds, manual cash-outs for supplier payments, petty cash \u2014 with nothing tying any of it to a person, a time, or a reason. Finance and operations had a standing complaint: unexplained shortages, and no way to trace them back to a shift, a cashier, or a moment.",
     problem:
       "A retail till isn't one continuous stream of money, it's a series of shifts, and every shift needs an opening balance, an audit trail of what moved during it, and a closing reconciliation. None of that existed. Two shops with the exact same sales could have wildly different trust in their own numbers, and there was no way for an owner to look at a till and ask \"who had this open, and does it balance?\" The other constraint was just as real: whatever I designed had to survive a lunch-rush queue. A cashier mid-transaction cannot be asked to fill out a form.",
+    beforeAfter: {
+      title: "What actually changed",
+      before: {
+        title: "Before",
+        points: [
+          "No record of who opened a till, or with how much",
+          "Manual, paper-based end-of-day cash counts, if done at all",
+          "Shortage complaints with no way to trace them to a shift",
+          "One flat mode \u2014 every shop forced into the same (nonexistent) process",
+        ],
+      },
+      after: {
+        title: "After",
+        points: [
+          "Every session tied to a cashier, an opening balance, and a timestamp",
+          "Denomination-level closing counts built into the flow itself",
+          "A filterable Short / Excess / Balanced status across every location",
+          "Two enforcement modes, so a kirana and a multi-till restaurant aren't forced into the same friction",
+        ],
+      },
+    },
     approach: [
       {
         title: "Design the entire lifecycle before writing a line of code",
@@ -81,10 +167,60 @@ export const projects: Project[] = [
         caption: "The QA punch list, closed ticket by ticket across web, app, and backend",
       },
     ],
+    designSystem: {
+      title: "Working inside an existing system, not inventing a new one",
+      intro:
+        "Cash Sessions had to look and feel like the rest of Tigg POS on day one, not like a bolted-on feature. That meant designing entirely within the product's existing visual language rather than introducing anything new \u2014 the same primary blue, the same status-color logic already used elsewhere in the POS, extended consistently to a new domain.",
+      colors: [
+        { name: "POS Primary", hex: "#143E9F" },
+        { name: "Balanced / Success", hex: "#1DB954" },
+        { name: "Short / Danger", hex: "#FF3350" },
+        { name: "Excess / Warning", hex: "#FFA726" },
+      ],
+      notes: [
+        "Status pills (Balanced / Short / Excess) reuse the product's existing semantic color logic \u2014 green means the till matches, red means it's short, amber means it's over.",
+        "Typography stayed on the existing Inter scale used across Tigg POS; no new type sizes were introduced for this feature.",
+      ],
+    },
+    architecture: {
+      title: "The session lifecycle",
+      intro:
+        "Every cash session moves through the same core lifecycle regardless of which mode a shop runs in \u2014 what differs between strict and easy mode is which of these states enforce ownership and which don't.",
+      source: { label: "Cash Session", detail: "opened by a cashier, with a starting balance" },
+      targets: [
+        { label: "Cash In" },
+        { label: "Cash Out" },
+        { label: "Denomination Count" },
+        { label: "Audit Trail" },
+        { label: "Closing Reconciliation" },
+        { label: "Session Report" },
+      ],
+    },
+    commitGraph: {
+      title: "53 commits, 23 real days",
+      intro:
+        "Real commit activity pulled directly from the feature's git history, June 2\u201324, 2026. The two dense clusters, June 9\u201313 and June 15\u201318, are the core build; the quieter days on either side are design lock-in and QA hardening.",
+      data: [1, 0, 0, 0, 0, 0, 2, 7, 4, 10, 3, 1, 0, 8, 8, 2, 3, 0, 0, 0, 0, 2, 2],
+      totalLabel: "53 commits \u00b7 June 2\u201324, 2026 \u00b7 tigg-pos-ui",
+    },
+    mockupGallery: {
+      title: "Key screens",
+      intro:
+        "Illustrative recreations built with Tigg POS's real primary blue and gray scale, reconstructing the actual flow without reproducing any real customer or business data.",
+      items: [
+        { caption: "Session list \u2014 Short / Excess / Balanced at a glance", mockupId: "cash-sessions-list" },
+        { caption: "Closing \u2014 denomination-level cash count", mockupId: "cash-sessions-denomination" },
+        { caption: "Audit trail \u2014 every movement, timestamped and authored", mockupId: "cash-sessions-audit" },
+      ],
+    },
     solution:
       "Every shift on Tigg POS now has a real audit trail: who opened the till and with how much, every manual cash movement with a note and an author attached, and a reconciliation status a manager can filter for across every location at once. Because the same person who designed it also built it, the shipped interface matches the Figma source almost exactly \u2014 including the states nobody remembers to design until they've been burned by skipping them once.",
     reflection:
       "If I redid this, I'd build the denomination-counting UI before the audit-history view, not after \u2014 it turned out to be the screen cashiers actually touch every single close, and it went through three redesigns late in the build because I hadn't prioritized real cashier feedback on it early enough. The lesson: design completeness (covering every state) and design priority (which screen gets the most iteration) are two different disciplines, and I conflated them here.",
+    quote: {
+      quote: "Design completeness and design priority are two different disciplines. I conflated them here, and I won't again.",
+      author: "Bibhushan, in the project retro",
+    },
     outcomes: [
       { value: "53", label: "commits, design to production" },
       { value: "23", label: "days, first commit to shipped" },
@@ -114,6 +250,27 @@ export const projects: Project[] = [
       "Tigg Web handles invoicing, bookkeeping, VAT compliance, and banking for Nepali SMEs, most of whom transact only in NPR. But import/export businesses, and anyone paying a foreign supplier or invoicing a foreign client, need the product to handle a second currency correctly everywhere: bank accounts, payments, journal entries, reconciliation. Before this, currency handling had grown ad hoc, form by form, over years of the product's life.",
     problem:
       "In accounting software, currency isn't a display preference, it's correctness. A stale exchange rate or a wrongly-signed cross-currency amount produces books that don't balance, and a business's books not balancing isn't a bug report, it's their actual finances being wrong. The dangerous version of this project would have been patching each of a dozen-plus forms individually \u2014 bank statements, journal vouchers, cash transfers, customer and supplier payments, quick receipts, invoices, credit notes, sales orders, quotations, reconciliation, opening balances \u2014 each ending up with subtly different currency behavior that someone would have to maintain forever, and that a user would experience as inconsistency.",
+    beforeAfter: {
+      title: "What actually changed",
+      before: {
+        title: "Before",
+        points: [
+          "Currency logic duplicated, slightly differently, in a dozen-plus forms",
+          "Exchange-rate fields shown even to NPR-only businesses that never needed them",
+          "Stale exchange rates could persist after switching accounts",
+          "Sign-ordering on cross-currency amounts was inconsistent form to form",
+        ],
+      },
+      after: {
+        title: "After",
+        points: [
+          "One shared component and one hook behind every form's currency behavior",
+          "NPR-only businesses see no currency UI at all \u2014 zero added complexity for the majority",
+          "Exchange rate clears automatically the moment an account changes",
+          "Consistent currency-code display and sign ordering everywhere, including new forms built later",
+        ],
+      },
+    },
     approach: [
       {
         title: "Build the abstraction before touching a single form",
@@ -134,10 +291,51 @@ export const projects: Project[] = [
         caption: "The hardening tail: currency-lock fixes, sign-ordering corrections, and reviewer-driven edge cases, commit by commit",
       },
     ],
+    architecture: {
+      title: "One hook, twelve-plus forms",
+      intro:
+        "The entire rollout hinges on a single shared implementation. Every form below consumes the same hook and component rather than maintaining its own currency logic \u2014 this is what makes the behavior consistent and the codebase maintainable going forward.",
+      source: { label: "useAccountCurrencyLock + form-currency.jsx", detail: "one hook, one component" },
+      targets: [
+        { label: "Bank Statement" },
+        { label: "Journal Voucher" },
+        { label: "Cash Transfer" },
+        { label: "Customer Payment" },
+        { label: "Supplier Payment" },
+        { label: "Quick Receipt" },
+        { label: "New Invoice" },
+        { label: "Credit Note" },
+        { label: "Sales Order" },
+        { label: "Quotation" },
+        { label: "Reconciliation" },
+        { label: "Opening Balance" },
+      ],
+    },
+    commitGraph: {
+      title: "The opening rollout burst",
+      intro:
+        "Real commit activity from the first two weeks of the rollout, pulled directly from git history. This is the initial sweep across the product; the hardening tail described above continued for several more weeks beyond this window.",
+      data: [2, 0, 0, 7, 3, 5, 0, 5, 0, 0, 8, 6, 0, 1],
+      totalLabel: "Initial rollout window \u00b7 June 27 \u2013 July 10, 2025 \u00b7 tigg-v2-ui",
+    },
+    mockupGallery: {
+      title: "Key states",
+      intro:
+        "Illustrative recreations of the shared component's real behavior across account types, built with Tigg Web's actual accent tones.",
+      items: [
+        { caption: "Cross-currency account \u2014 exchange rate field appears", mockupId: "currency-locked" },
+        { caption: "NPR-only account \u2014 no currency UI shown at all", mockupId: "currency-disabled" },
+        { caption: "The sweep \u2014 twelve-plus forms consuming one shared hook", mockupId: "currency-sweep" },
+      ],
+    },
     solution:
       "Multi-currency became a product-wide capability instead of a per-form patch. Import/export businesses can post, pay, and reconcile across currencies with the same consistent behavior on every surface, and any new form built after this inherits correct currency handling automatically from the shared component instead of reinventing it.",
     reflection:
       "The abstraction-first approach was the right call, but I'd instrument it earlier next time: a lot of the 32 hardening commits were bugs a peer reviewer caught by reading carefully, not bugs a test caught automatically. A handful of targeted tests around sign-ordering and stale-rate clearing, written alongside the hook itself rather than after, would have caught several of these before review rather than during it.",
+    quote: {
+      quote: "Ninety-seven files changed, one place where the logic actually lives. That ratio is the whole point.",
+      author: "Bibhushan, on the rollout",
+    },
     outcomes: [
       { value: "57", label: "commits in 3.5 weeks" },
       { value: "97", label: "files changed across the product" },
@@ -164,6 +362,17 @@ export const projects: Project[] = [
       "Nepal records 151 maternal deaths per 100,000 live births, more than double the SDG target. One in three new mothers screens positive for postpartum depression, and most are never screened at all. Only 39% of husbands attend a single antenatal visit. The period-tracking apps available in Nepal are translated Western products: they don't speak Nepali, don't know what Aama Surakshya is, and treat cycle, pregnancy, loss, and motherhood as separate products \u2014 for what is actually one woman living one continuous life.",
     problem:
       "We set out to build a better period tracker. Then we spent six months talking to women, mothers and daughters, OB-GYNs, and female community health volunteers across Kathmandu Valley and Chitwan. The realization that redirected the entire project: these were never separate problems needing separate apps. They were one woman, at different points in one life, unsupported at every single one of them.",
+    research: {
+      title: "What six months of field research actually found",
+      intro:
+        "Before a single screen was designed, the team spent six months talking to women, mothers, OB-GYNs, and female community health volunteers across Kathmandu Valley and Chitwan. These numbers are why the original period-tracker concept was killed.",
+      findings: [
+        { value: "151", label: "maternal deaths per 100,000 live births in Nepal", source: "national health data cited in research" },
+        { value: "1 in 3", label: "new mothers screen positive for postpartum depression \u2014 most never screened at all" },
+        { value: "39%", label: "of husbands attend even a single antenatal visit with their partner" },
+        { value: "1 in 5", label: "known pregnancies end in loss \u2014 a reality most tracking apps design around, not for" },
+      ],
+    },
     approach: [
       {
         title: "Kill the period-tracker idea; design a companion instead",
@@ -175,7 +384,7 @@ export const projects: Project[] = [
         title: "Build a genuinely Nepali design language, not a localized one",
         body:
           "The brand comes from the culture it serves rather than being translated into it afterward: Fraunces paired with Noto Sans Devanagari, a warm ivory-and-terracotta palette instead of an imported clinical white-and-teal, mandala and prayer-flag motifs, and copy written in Nepali for Nepali bodies rather than translated English. Dark mode and WCAG-checked contrast throughout, with an easing curve tuned to feel calm rather than snappy \u2014 this is health software, not a productivity app.",
-        caption: "Brand system: ivory, terracotta, wine, and saffron; Fraunces headlines paired with Devanagari body text",
+        caption: "Brand system: warm wine and blush tones instead of an imported clinical white-and-teal palette",
       },
       {
         title: "Design and build the platform myself",
@@ -190,6 +399,34 @@ export const projects: Project[] = [
         caption: "Companion mode's permissioned partner access, and the Clinician Inbox connecting to real NMC-registered OB-GYNs",
       },
     ],
+    designSystem: {
+      title: "A design language sampled from the real brand",
+      intro:
+        "Colors as actually shipped in Myra's brand and marketing material \u2014 sampled directly from the real asset, not approximated. Warm and editorial instead of the clinical white-and-teal most health apps default to.",
+      colors: [
+        { name: "Wine", hex: "#9C3A3E" },
+        { name: "Blush", hex: "#FBEDE8" },
+        { name: "Ink", hex: "#2A2321" },
+        { name: "Paper", hex: "#FFFFFF" },
+      ],
+      notes: [
+        "Fraunces for display headlines, Noto Sans Devanagari for Nepali body text \u2014 chosen so the Nepali script reads with the same warmth as the Latin type, not as an afterthought font swap.",
+        "Mandala and prayer-flag motifs used sparingly as texture, not as decoration layered on top of an otherwise generic layout.",
+      ],
+    },
+    quote: {
+      quote: "These were never separate problems needing separate apps. They were one woman, at different points in one life, unsupported at every single one of them.",
+      author: "Bibhushan, on the research pivot that redefined Myra",
+    },
+    credits: {
+      title: "Founding team",
+      members: [
+        { name: "Bibhushan Saakha", role: "Co-founder \u00b7 Product & Design" },
+        { name: "Co-founder", role: "Clinical & Research Partnerships" },
+        { name: "Co-founder", role: "Growth & Operations" },
+        { name: "Co-founder", role: "Backend & Data" },
+      ],
+    },
     solution:
       "A companion, not a tracker: distributed at the point of care \u2014 an OB-GYN hands over a Myra card at the first antenatal visit, a QR scan pre-fills her pregnancy, and from there the product follows her through cycle, pregnancy, postpartum, and motherhood in her own language, with her own doctors, and with her partner invited in on her terms.",
     reflection:
@@ -238,6 +475,37 @@ export const projects: Project[] = [
         caption: "Museum selection and onboarding screens \u2014 the conventional shell that makes the AR layer optional rather than mandatory",
       },
     ],
+    architecture: {
+      title: "The interaction, step by step",
+      intro:
+        "The entire product reduces to one honest interaction loop, kept deliberately simple under hackathon time pressure so it could actually be finished and demoed in 48 hours.",
+      source: { label: "Point camera at artifact", detail: "core interaction" },
+      targets: [
+        { label: "Recognition resolves" },
+        { label: "Context card renders" },
+        { label: "Language auto-applies" },
+        { label: "Read more, on demand" },
+        { label: "Audio narration, optional" },
+      ],
+    },
+    designSystem: {
+      title: "Visual language",
+      intro:
+        "A deliberately high-contrast black-and-white shell with a warm ember-to-gold gradient reserved for the AR moment itself \u2014 so the brand reads as serious and museum-appropriate everywhere except the one screen designed to feel alive.",
+      colors: [
+        { name: "Ink", hex: "#000000" },
+        { name: "Paper", hex: "#FFFFFF" },
+        { name: "Ember", hex: "#E8543D" },
+        { name: "Gold", hex: "#F4C430" },
+      ],
+      notes: [
+        "The ember-to-gold gradient is used exactly once, on the AR wordmark, so it stays a signature rather than becoming visual noise across the app.",
+      ],
+    },
+    quote: {
+      quote: "It's impressive as a stage demo and useless as a daily tool the moment the interaction model gets sloppy. We designed for the second one.",
+      author: "Bibhushan, on the AR design brief",
+    },
     solution:
       "A working AR prototype that turned static museum placards into an instant, multi-language, camera-first experience, built and demoed within a 48-hour hackathon window, good enough to win Open Innovation at KU Hackfest.",
     reflection:
@@ -280,6 +548,34 @@ export const projects: Project[] = [
         caption: "Order details, cart review, and the order-tracking flow through to completion",
       },
     ],
+    designSystem: {
+      title: "Visual language",
+      intro:
+        "One brand green carried consistently across every card, button, and confirmation state, sampled directly from the real UI kit \u2014 the discipline of the project was refusing to introduce a second accent color anywhere.",
+      colors: [
+        { name: "Brand Green", hex: "#1E9E52" },
+        { name: "Paper", hex: "#FFFFFF" },
+        { name: "Surface Gray", hex: "#F4F4F4" },
+        { name: "Ink", hex: "#1E1E1E" },
+      ],
+      notes: [
+        "Every primary action, from \"Add to Cart\" to \"Reserve Table\" to \"Place My Order,\" uses the identical green and identical corner treatment \u2014 no competing accent color anywhere in the system.",
+      ],
+    },
+    architecture: {
+      title: "The order lifecycle",
+      intro:
+        "One connected flow designed as a system, not a sequence of separately-designed screens \u2014 the reservation path runs in parallel using the same confirmation pattern as the ordering path.",
+      source: { label: "Browse nearby", detail: "restaurant discovery" },
+      targets: [
+        { label: "Restaurant page" },
+        { label: "Menu & cart" },
+        { label: "Order details" },
+        { label: "Table reservation" },
+        { label: "Order tracking" },
+        { label: "Completed" },
+      ],
+    },
     solution:
       "A cohesive mobile UI system covering discovery, ordering, and reservation as one connected product rather than three disconnected features, built to demonstrate that the hard part of this category is consistency across the seams, not any individual screen.",
     reflection:
@@ -330,6 +626,27 @@ export const projects: Project[] = [
         caption: "The full analytics pipeline running client-side: PapaParse for import, Recharts for every view",
       },
     ],
+    architecture: {
+      title: "The whole pipeline runs in the tab",
+      intro:
+        "No backend, no upload endpoint, no auth system \u2014 the entire flow from raw file to rendered chart happens client-side, which is the actual reason the privacy claim is true rather than just stated.",
+      source: { label: "statement.csv", detail: "dropped into the browser" },
+      targets: [
+        { label: "PapaParse (parsing)" },
+        { label: "Column mapping" },
+        { label: "Local computation" },
+        { label: "Recharts (rendering)" },
+      ],
+    },
+    mockupGallery: {
+      title: "Key screens",
+      intro: "Illustrative recreations of Dime's real views, built with its actual dark dashboard palette.",
+      items: [
+        { caption: "Monthly spend, at a glance", mockupId: "dime-dashboard" },
+        { caption: "Categories, this month", mockupId: "dime-categories" },
+        { caption: "Import \u2014 parsed locally, nothing uploaded", mockupId: "dime-import" },
+      ],
+    },
     solution:
       "A fast, quiet dashboard over your own financial data. No accounts, no cloud, no subscription, open it, drop a CSV, and see the month clearly.",
     reflection:

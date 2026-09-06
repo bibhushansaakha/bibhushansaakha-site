@@ -9,6 +9,14 @@ import { Reveal, RevealGroup } from "@/components/motion/Reveal";
 import { CountUp } from "@/components/motion/CountUp";
 import { GridLines } from "@/components/ui/GridLines";
 import { TypographicCover } from "@/components/work/TypographicCover";
+import { ResearchStats } from "@/components/case-study/ResearchStats";
+import { ColorPalette } from "@/components/case-study/ColorPalette";
+import { ArchitectureDiagram } from "@/components/case-study/ArchitectureDiagram";
+import { CommitGraph } from "@/components/case-study/CommitGraph";
+import { BeforeAfter } from "@/components/case-study/BeforeAfter";
+import { QuoteBlock } from "@/components/case-study/QuoteBlock";
+import { CreditsBlock } from "@/components/case-study/CreditsBlock";
+import { mockupRegistry } from "@/components/case-study/MockupRegistry";
 import { projects, getProjectBySlug } from "@/lib/content/projects";
 
 export function generateStaticParams() {
@@ -41,6 +49,11 @@ export default async function CaseStudyPage({
 
   const currentIndex = projects.findIndex((p) => p.slug === slug);
   const next = projects[(currentIndex + 1) % projects.length];
+
+  // A running counter for numbered editorial sections, so the numbering
+  // stays sequential no matter which optional sections a given case study has.
+  let n = 0;
+  const idx = () => String(++n).padStart(2, "0");
 
   return (
     <>
@@ -112,19 +125,37 @@ export default async function CaseStudyPage({
 
         <Container size="narrow" className="mt-16 space-y-20 sm:mt-24">
           <Reveal>
-            <SectionBlock index="01" title="Context">
+            <SectionBlock index={idx()} title="Context">
               <p>{project.context}</p>
             </SectionBlock>
           </Reveal>
 
+          {project.research && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.research.title}>
+                <p className="mb-8">{project.research.intro}</p>
+                <ResearchStats findings={project.research.findings} />
+              </SectionBlock>
+            </Reveal>
+          )}
+
           <Reveal>
-            <SectionBlock index="02" title="The problem">
+            <SectionBlock index={idx()} title="The problem">
               <p>{project.problem}</p>
             </SectionBlock>
           </Reveal>
 
+          {project.beforeAfter && (
+            <Reveal>
+              <p className="mb-4 font-mono text-xs uppercase tracking-wider text-muted">
+                {project.beforeAfter.title}
+              </p>
+              <BeforeAfter before={project.beforeAfter.before} after={project.beforeAfter.after} />
+            </Reveal>
+          )}
+
           <div>
-            <SectionBlock index="03" title="Approach" />
+            <SectionBlock index={idx()} title="Approach" />
             <RevealGroup className="mt-8 space-y-10">
               {project.approach.map((step, i) => (
                 <div key={step.title} className="grid grid-cols-1 gap-4 border-t hairline pt-8 sm:grid-cols-[3rem_1fr]">
@@ -143,14 +174,58 @@ export default async function CaseStudyPage({
             </RevealGroup>
           </div>
 
+          {project.mockupGallery && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.mockupGallery.title}>
+                <p className="mb-8">{project.mockupGallery.intro}</p>
+                <MockupGalleryGrid items={project.mockupGallery.items} />
+              </SectionBlock>
+            </Reveal>
+          )}
+
+          {project.designSystem && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.designSystem.title}>
+                <p className="mb-8">{project.designSystem.intro}</p>
+                <ColorPalette colors={project.designSystem.colors} />
+                <ul className="mt-6 space-y-2">
+                  {project.designSystem.notes.map((note) => (
+                    <li key={note} className="flex gap-2 text-base leading-relaxed text-ink/80">
+                      <span className="text-accent">&middot;</span>
+                      <span>{note}</span>
+                    </li>
+                  ))}
+                </ul>
+              </SectionBlock>
+            </Reveal>
+          )}
+
+          {project.architecture && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.architecture.title}>
+                <p className="mb-8">{project.architecture.intro}</p>
+                <ArchitectureDiagram source={project.architecture.source} targets={project.architecture.targets} />
+              </SectionBlock>
+            </Reveal>
+          )}
+
+          {project.commitGraph && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.commitGraph.title}>
+                <p className="mb-8">{project.commitGraph.intro}</p>
+                <CommitGraph data={project.commitGraph.data} totalLabel={project.commitGraph.totalLabel} />
+              </SectionBlock>
+            </Reveal>
+          )}
+
           <Reveal>
-            <SectionBlock index="04" title="Solution">
+            <SectionBlock index={idx()} title="Solution">
               <p>{project.solution}</p>
             </SectionBlock>
           </Reveal>
 
           <Reveal>
-            <SectionBlock index="05" title="Outcomes">
+            <SectionBlock index={idx()} title="Outcomes">
               <dl className="grid grid-cols-1 gap-8 sm:grid-cols-3">
                 {project.outcomes.map((outcome) => (
                   <div key={outcome.label}>
@@ -165,8 +240,22 @@ export default async function CaseStudyPage({
             </SectionBlock>
           </Reveal>
 
+          {project.quote && (
+            <Reveal>
+              <QuoteBlock quote={project.quote.quote} author={project.quote.author} />
+            </Reveal>
+          )}
+
+          {project.credits && (
+            <Reveal>
+              <SectionBlock index={idx()} title={project.credits.title}>
+                <CreditsBlock credits={project.credits.members} />
+              </SectionBlock>
+            </Reveal>
+          )}
+
           <Reveal>
-            <SectionBlock index="06" title="What I'd do differently">
+            <SectionBlock index={idx()} title="What I'd do differently">
               <p>{project.reflection}</p>
             </SectionBlock>
           </Reveal>
@@ -215,5 +304,22 @@ function SectionBlock({
       </div>
       {children && <div className="text-lg leading-relaxed text-ink/80">{children}</div>}
     </section>
+  );
+}
+
+function MockupGalleryGrid({ items }: { items: { caption: string; mockupId: string }[] }) {
+  return (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      {items.map((item) => (
+        <figure key={item.mockupId} className="border hairline">
+          <div className="aspect-[4/3] w-full overflow-hidden bg-paper-dim">
+            {mockupRegistry[item.mockupId] ?? null}
+          </div>
+          <figcaption className="border-t hairline p-4 font-mono text-xs uppercase tracking-wide text-muted">
+            {item.caption}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
   );
 }
